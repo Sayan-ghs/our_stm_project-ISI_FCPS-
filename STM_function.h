@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 //#include <input.h>
-// #include"input.h"
-#include "input_13.h"
+#include"input.h"
+// #include "input_13.h"
 // #include "input_15.h"
 // #include "input_20.h"
 
@@ -52,5 +52,19 @@ void remove_first_element(Task* list, int size_list);
 void binary_search_add_element(Task* list, int size_list, Task new_task);
 int srspPriorityGen(int j, pc_system cs, float* x_nom_0, float u_nom_0, float* x_hm_0, float u_hm_0,
 		float* x_nom_1, float* u_nom_1, float* x_hm_1, float* u_hm_1, int lst, int tot, int hit_or_miss);
-
+int randi_range(int min, int max);
+int compare_int(const void *a, const void *b);
+void obtain_sudden_task_data(
+    int horizon,
+    int *rand_time,
+    int arrival[],
+    int periods[],
+    int executionTimes[],
+    int hard_or_weakly_hard[]
+);        
+void obtain_weakly_hard_m_k(
+    int hard_or_weakly_hard,
+    int m_k_firm[2]
+);
+int weakly_hard_requirement_check(int m_k_firm[2], int zer, int ind);
 #endif

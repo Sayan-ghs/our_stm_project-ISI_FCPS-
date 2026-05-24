@@ -261,11 +261,15 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+#include<stdlib.h>
+#include <math.h>
+#include <time.h>
 #include"STM_function.h"
-// #include"input.h"
+#include"input.h"
 // #include "input_13.h"
 //#include "input_15.h"
-#include "input_20.h"
+// #include "input_20.h"
+#define Max_Tasks 200
 
 // extern void initialise_monitor_handles(void);
 
@@ -307,8 +311,8 @@
 
 /* --- Simulation Parameters --- */
 
-//#define n 3
-//#define SIM_TICKS 40
+#define n 3
+#define SIM_TICKS 120
 
 //#define n 5
 //#define SIM_TICKS 120
@@ -325,8 +329,8 @@
 //#define n 11
 //#define SIM_TICKS 600
 
-#define n 13
-#define SIM_TICKS 30000
+// #define n 13
+// #define SIM_TICKS 30000
 
 //#define n 15
 //#define SIM_TICKS 600
@@ -412,9 +416,9 @@ int main(void) {
 //     DWT_CYCCNT = 0;
 //     DWT_CONTROL |= 1;
 
-    Task task_set[30] = {0};
-    Task only_EDF_list[30] = {0};
-    Task srsp_and_EDF_list[30] = {0};
+    Task task_set[200] = {0};
+    Task only_EDF_list[200] = {0};
+    Task srsp_and_EDF_list[200] = {0};
     Task job = {0};
 
     pc_system inp_detail[30];
@@ -423,10 +427,10 @@ int main(void) {
     int size_SRSP_EDF_list = 0;
     int flag_srsp_and_edf_list = 0;
     int flag_only_edf_list = 0;
-    int srsp_prio[30];
-    int lst[30];
-    int tot[30] = {0};
-    int hit_or_miss[30];
+    int srsp_prio[200];
+    int lst[200];
+    int tot[200] = {0};
+    int hit_or_miss[200];
     int hit_miss_matrix[n][SIM_TICKS];
     for(int i = 0;i<n;i++){
         for(int j = 0; j< SIM_TICKS; j++){
@@ -457,13 +461,16 @@ int main(void) {
     float x_nom_0[30][10], x_hm_0[30][10], x_nom_1[30][10], x_hm_1[30][10];
     float u_nom_0[30], u_nom_1[30], u_hm_0[30], u_hm_1[30];
     float max_util=0;
+    float min_util=0;
+    float show=0;
+    int m,k;
     int proc_util = 0;
     float util=0;
     float sch_ratio=0;
     int pos;
 
     // WCET
-//    int wcet[] = {3, 2, 4}; // n = 3, Sim_ticks = 40
+   int wcet[] = {3, 2, 4}; // n = 3, Sim_ticks = 40
 
 //    int wcet[] = {3, 2, 5, 2, 2}; // n=5, sim_ticks = 120
 
@@ -475,7 +482,7 @@ int main(void) {
 
 //    int wcet[] = {3,2,4,2,2,2,4,4,3,3,2,3}; //n=12
 
-    int wcet[] = {2,2,4,2,2,2,3,3,2,2,2,2,2}; // n = 13, sim_ticks = 600
+    // int wcet[] = {2,2,4,2,2,2,3,3,2,2,2,2,2}; // n = 13, sim_ticks = 600
 
 //     int wcet[] = {2,2,4,2,2,2,3,3,2,2,2,2,2,2,2}; // n = 15, sim_ticks = 600
 
@@ -508,15 +515,68 @@ int main(void) {
         u_hm_1[i] = inp_detail[i].init_input;
 
         max_util = max_util + ((float)task_set[i].exec_time/(float)task_set[i].period);
+
+        m = inp_detail[i].r;
+        k = inp_detail[i].l;
+        min_util = min_util + (((float)m / (float)k)*((float)task_set[i].exec_time/(float)task_set[i].period));
 //        printf("Value: %f\n",((float)task_set[i].exec_time/(float)task_set[i].period));
 //        printf("i: %d,   Max Util : %f\n",i,max_util);
 
     }
-    if (max_util <=1){
-    	schedule_edf = 1;
-    }else{
-    	schedule_edf = 0;
+    printf("min_util : %f\n", min_util);
+
+    /***************    SUDDEN TASK INITIALIZATION ***********************************/
+    srand(time(NULL));  //random seed generator
+    // int horizon = 10000;
+    int rand_time;
+    // int arrival[Max_Tasks];             // only for sudden tasks
+    // int periods[Max_Tasks];             // only for sudden tasks
+    // int executionTimes[Max_Tasks];      // only for sudden tasks
+    // int hard_or_weakly_hard[Max_Tasks];   // only for sudden tasks
+    int m_k_firm[Max_Tasks][2] = {0};   // only for sudden tasks
+    int task_selected[200] = {0};
+    for (int i=0;i<n;i++){
+        task_selected[i]=1;
     }
+    int zero[Max_Tasks]={0};   // only for sudden tasks
+    int index[Max_Tasks]={0};  // only for sudden tasks
+    
+
+    // Obtaining sudden tasks
+    // obtain_sudden_task_data(SIM_TICKS, &rand_time, arrival, periods, executionTimes, hard_or_weakly_hard);
+    rand_time = 3;
+    int arrival[3] = {9, 20, 52};
+    int periods[3] = {15,25,30};
+    int executionTimes[3] = {1,2,3};
+    int hard_or_weakly_hard[3] = {0,0,1};
+
+    // Entering random tasks
+    for (int i=0;i<rand_time;i++){
+        task_set[i+n].id = i+n+1;
+        task_set[i+n].period = periods[i];
+        // task_set[i+n].abs_deadline = periods[i]+arrival[i];
+        task_set[i+n].abs_deadline = arrival[i];
+        task_set[i+n].exec_time = executionTimes[i];
+        task_set[i+n].remaining = executionTimes[i];
+
+        // Obtaining weaky hard constraint for task
+        obtain_weakly_hard_m_k(hard_or_weakly_hard[i],m_k_firm[i]);
+        printf("m : %d, k : %d\n", m_k_firm[i][0],m_k_firm[i][1]);
+    }
+    
+    printf("\n Arrival :  \t");
+    for(int i = 0; i<rand_time;i++){
+        printf("%d ",arrival[i]);
+    }
+    
+
+    // if (max_util <=1){
+    // 	schedule_edf = 1;
+    // }else{
+    // 	schedule_edf = 0;
+    // }
+
+
 //    printf("Max Util : %f",max_util);
 //    for(int j = 0; j<n; j++){
 //    	printf("%d : %d, %d, %d, %d\n",task_set[j].id, task_set[j].period, task_set[j].exec_time, task_set[j].remaining, task_set[j].abs_deadline);
@@ -529,9 +589,10 @@ int main(void) {
 //     GPIOB_ODR |= (1 << 0); // LED ON
 
     /* --- Simulation Engine --- */
+    printf("Hello1,Rand_time : %d\n",rand_time);
     for (int t = 0; t <= SIM_TICKS; t++) {
         //     uint32_t start = DWT_CYCCNT;
-
+        // printf("hello2, t : %d\n",t);
             // =========================================================================== //
             /****************************   SCHEDULING LOGIC ****************************** */
             // =========================================================================== //
@@ -540,7 +601,7 @@ int main(void) {
             flag_only_edf_list = 0;
             job_selected=0;
             best=100;
-        //    printf("Time: %d\n",t);
+           printf("Time: %d\n",t);
 
 
             // *************************** Job Removal  ***********************************
@@ -548,17 +609,23 @@ int main(void) {
 				while(1){
 					 if(t == only_EDF_list[0].abs_deadline){
 						 int i = only_EDF_list[0].id-1;
-                                                 job = only_EDF_list[0];
-                                                // if(t == 450 && i == 0){
-                                                //         printf("\n 1st removal (before) :  deadline = %d , period = %d, lst = %d \n",job.abs_deadline, job.period, lst[i]);
-                                                // }
-						 lst[i] = (job.abs_deadline / job.period);
-						 tot[i] = tot[i] + 1;
-						 hit_or_miss[i]=0;
-                                                 hit_miss_matrix[i][lst[i]] = 0;
-                                                //  if(t == 450 && i == 0){
-                                                //         printf("\n 1st removal (after) :  deadline = %d , period = %d, lst = %d \n",job.abs_deadline, job.period, lst[i]);
-                                                // }
+                         printf("hello2, i : %d\n",i);
+                        job = only_EDF_list[0];
+                        // if(t == 450 && i == 0){
+                        //         printf("\n 1st removal (before) :  deadline = %d , period = %d, lst = %d \n",job.abs_deadline, job.period, lst[i]);
+                        // }
+                        if (i<n){
+                                lst[i] = (job.abs_deadline / job.period);
+                                tot[i] = tot[i] + 1;
+                                hit_or_miss[i]=0;
+                                hit_miss_matrix[i][lst[i]-1] = 0;
+                        }else{
+                            printf("hello2, i : %d\n",i);
+                               zero[i-n]+=1;
+                        }
+                        //  if(t == 450 && i == 0){
+                        //         printf("\n 1st removal (after) :  deadline = %d , period = %d, lst = %d \n",job.abs_deadline, job.period, lst[i]);
+                        // }
 						 remove_first_element(only_EDF_list, size_EDF_list);
 						 size_EDF_list--;
 
@@ -662,7 +729,7 @@ int main(void) {
                                 if(srsp_prio[i] == 0){
                                         binary_search_add_element(only_EDF_list, size_EDF_list, task_set[i]);
                                         size_EDF_list++;
-                                }else{
+                                }else if(srsp_prio[i] == 1){
                                         binary_search_add_element(srsp_and_EDF_list, size_SRSP_EDF_list, task_set[i]);
                                         size_SRSP_EDF_list++;
                                 }
@@ -681,24 +748,92 @@ int main(void) {
                     }
             }
 
-//            printf("\n After job arrival\n\n");
-//            printf("srsp_EDF_List\t");
-//
-//            for(int k = 0; k<size_SRSP_EDF_list; k++){
-//            	printf("%d : %d, %d, %d, %d\n",srsp_and_EDF_list[k].id,srsp_and_EDF_list[k].period, srsp_and_EDF_list[k].exec_time, srsp_and_EDF_list[k].remaining, srsp_and_EDF_list[k].abs_deadline);
-//            }
-//
-//            printf("\n only_EDF_list: \t");
-//
-//            for(int k = 0; k<size_EDF_list; k++){
-//            	printf("%d : %d, %d, %d, %d\n",only_EDF_list[k].id,only_EDF_list[k].period, only_EDF_list[k].exec_time, only_EDF_list[k].remaining,only_EDF_list[k].abs_deadline);
-//            }
+            // Sudden task arrival
+            for (int i=0;i<rand_time;i++){
+                if(t >= arrival[i]){
+                    // printf(" i : %d, t : %d, arrival : %d, task_selected : %d\n", i+n, t, arrival[i],task_selected[i+n]);
+                    // printf("\nt-arrival : %d, period : %d, mod : %d\n",t-arrival[i], task_set[i+n].period, ((t-arrival[i]) % task_set[i+n].period));
+                    if((t == arrival[i]) || ((t-arrival[i]) % task_set[i+n].period == 0)){
+                        
+                        // Call admission control
+                        if(t+task_set[i+n].period > SIM_TICKS){
+                            task_set[i+n].abs_deadline = task_set[i+n].abs_deadline + task_set[i+n].period; //adjust next period
+                            task_set[i+n].remaining = task_set[i+n].exec_time;
+                            continue;
+                        }
 
-//			printf("Task_set\t");
-//
-//			for(int k = 0; k<n; k++){
-//				printf("%d : %d, %d, %d, %d\n",task_set[k].id,task_set[k].period, task_set[k].exec_time, task_set[k].remaining, task_set[k].abs_deadline);
-//			}
+                        if (task_selected[i+n]==0){
+                            show = min_util + ((float)m_k_firm[i][0]/(float)m_k_firm[i][1]) * ((float)task_set[i+n].exec_time/(float)task_set[i+n].period);
+                            // printf("show : %f\n",show);
+                            //overload
+                            if (show > 1){
+                                task_set[i+n].abs_deadline = task_set[i+n].abs_deadline + task_set[i+n].period; //adjust next period
+                                task_set[i+n].remaining = task_set[i+n].exec_time;
+                                continue;
+                            }else{
+                                
+                                task_selected[i+n]=1;
+                                min_util = min_util + ((float)m_k_firm[i][0]/(float)m_k_firm[i][1]) * ((float)task_set[i+n].exec_time/(float)task_set[i+n].period);
+                        
+                            }
+                        }
+
+                        //After successful admission
+                        task_set[i+n].abs_deadline = task_set[i+n].abs_deadline  + task_set[i+n].period;
+                        task_set[i+n].remaining = task_set[i+n].exec_time;
+                        index[i] += 1;
+                        // printf("i : %d, t : %d, arrival : %d, task_selected : %d, wcet = %d\n", i+n, t, arrival[i],task_selected[i+n], task_set[i+n].remaining);
+
+                        if(t != SIM_TICKS){
+                            total_jobs += 1;  // new job released 
+                        }
+                        
+                    
+                        if (hard_or_weakly_hard[i]==1){
+                            srsp_prio[i+n] = 1;
+                        }else if (hard_or_weakly_hard[i]==0){
+                            srsp_prio[i+n] = weakly_hard_requirement_check(m_k_firm[i], zero[i], index[i]);
+                        }
+                        printf("srsp_prio : %d\n", srsp_prio[i+n]);
+
+                        if(srsp_prio[i+n] == 0){
+                                //  printf("id : %d, hello edf\n",i+n);
+                                binary_search_add_element(only_EDF_list, size_EDF_list, task_set[i+n]);
+                                size_EDF_list++;
+                                // printf("\n only_EDF_list: \t");
+                                // printf("\ntask1 prio : %d, lst : %d, tot : %d, hit_or_miss : %d\n", srsp_prio[0], lst[0], tot[0], hit_or_miss[0]);
+                                for(int k = 0; k<size_EDF_list; k++){
+                                    printf("%d ,%d , %d,  %d\n",only_EDF_list[k].id,only_EDF_list[k].period,only_EDF_list[k].abs_deadline, only_EDF_list[k].remaining);
+                                }
+                        }else if(srsp_prio[i+n] == 1){
+                                // printf("id : %d, hello srsp\n",i+n);
+                                binary_search_add_element(srsp_and_EDF_list, size_SRSP_EDF_list, task_set[i+n]);
+                                size_SRSP_EDF_list++;
+                        }
+                    }    
+                }
+            }
+
+            
+
+           printf("\n After job arrival\n\n");
+           printf("srsp_EDF_List\t");
+
+           for(int k = 0; k<size_SRSP_EDF_list; k++){
+           	printf("%d : %d, %d, %d, %d\n",srsp_and_EDF_list[k].id,srsp_and_EDF_list[k].period, srsp_and_EDF_list[k].exec_time, srsp_and_EDF_list[k].remaining, srsp_and_EDF_list[k].abs_deadline);
+           }
+
+           printf("\n only_EDF_list: \t");
+
+           for(int k = 0; k<size_EDF_list; k++){
+           	printf("%d : %d, %d, %d, %d\n",only_EDF_list[k].id,only_EDF_list[k].period, only_EDF_list[k].exec_time, only_EDF_list[k].remaining,only_EDF_list[k].abs_deadline);
+           }
+
+			printf("Task_set\t");
+
+			for(int k = 0; k<n; k++){
+				printf("%d : %d, %d, %d, %d\n",task_set[k].id,task_set[k].period, task_set[k].exec_time, task_set[k].remaining, task_set[k].abs_deadline);
+			}
 
             // *************************** Job Selection  ***********************************
             while (size_SRSP_EDF_list != 0 || size_EDF_list != 0){
@@ -721,10 +856,16 @@ int main(void) {
                 if(flag_only_edf_list ==1) {
                         if(t+job.remaining > job.abs_deadline){
                                 int i = job.id-1;
-                                lst[i] = (job.abs_deadline / job.period);
-                                tot[i] = tot[i] + 1;
-                                hit_or_miss[i]=0;
-                                hit_miss_matrix[i][lst[i]] = 0;
+
+                                if (i<n){
+                                        lst[i] = (job.abs_deadline / job.period);
+                                        tot[i] = tot[i] + 1;
+                                        hit_or_miss[i]=0;
+                                        hit_miss_matrix[i][lst[i]-1] = 0;
+                                }else{
+                                    zero[i-n]+=1;
+                                }
+
                                 // if(t == 450 && i == 0){
                                 //         printf("\n 2nd removal :  deadline = %d , period = %d, lst = %d \n",job.abs_deadline, job.period, lst[i]);
                                 // }
@@ -776,28 +917,33 @@ int main(void) {
                                 size_EDF_list--;
                         }
                         hit_or_miss[best]=1;
-                        hit_miss_matrix[best][job.abs_deadline/job.period] = 1;
+                        hit_miss_matrix[best][(job.abs_deadline/job.period)-1] = 1;
+                        
+                        if (best<n){
+                            hit_or_miss[best]=1;
+                            hit_miss_matrix[best][(job.abs_deadline/job.period)-1] = 1;
+                        }
                         if(t != SIM_TICKS){
                         	jobs_scheduled += 1;
 						}
                 }
             }
 //
-        //    if (t>=400){
-	// 			printf("\n At the End \n\n");
-	// 			printf("srsp_EDF_List\t");
+           if (t<=200){
+				printf("\n At the End \n\n");
+				printf("srsp_EDF_List\t");
 
-	// 			for(int k = 0; k<size_SRSP_EDF_list; k++){
-	// 				printf("%d, %d,  %d, %d\n",srsp_and_EDF_list[k].id,srsp_and_EDF_list[k].period, srsp_and_EDF_list[k].abs_deadline,srsp_and_EDF_list[k].remaining );
-	// 			}
+				for(int k = 0; k<size_SRSP_EDF_list; k++){
+					printf("%d, %d,  %d, %d\n",srsp_and_EDF_list[k].id,srsp_and_EDF_list[k].period, srsp_and_EDF_list[k].abs_deadline,srsp_and_EDF_list[k].remaining );
+				}
 
-	// 			printf("\n only_EDF_list: \t");
-        //                         printf("\ntask1 prio : %d, lst : %d, tot : %d, hit_or_miss : %d\n", srsp_prio[0], lst[0], tot[0], hit_or_miss[0]);
+				printf("\n only_EDF_list: \t");
+                // printf("\ntask1 prio : %d, lst : %d, tot : %d, hit_or_miss : %d\n", srsp_prio[0], lst[0], tot[0], hit_or_miss[0]);
 
-	// 			for(int k = 0; k<size_EDF_list; k++){
-	// 				printf("%d ,%d , %d,  %d\n",only_EDF_list[k].id,only_EDF_list[k].period,only_EDF_list[k].abs_deadline, only_EDF_list[k].remaining);
-	// 			}
-        //    }
+				for(int k = 0; k<size_EDF_list; k++){
+					printf("%d ,%d , %d,  %d\n",only_EDF_list[k].id,only_EDF_list[k].period,only_EDF_list[k].abs_deadline, only_EDF_list[k].remaining);
+				}
+            }
 
             /********************************************************************************/
             /********************************************************************************/

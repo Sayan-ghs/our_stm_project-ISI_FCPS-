@@ -3,8 +3,8 @@
 #include<stdlib.h>
 #include <string.h>
 #include"STM_function.h"
-// #include "input.h"
-#include "input_13.h"
+#include "input.h"
+// #include "input_13.h"
 // #include "input_15.h"
 // #include "input_20.h"
 
@@ -430,5 +430,121 @@ int srspPriorityGen(int j, pc_system cs, float* x_nom_0, float u_nom_0, float* x
                 return 1;
         }
 
+}
+
+/* Generate random integer between min and max */
+int randi_range(int min, int max){
+    return min + rand() % (max - min + 1);
+}
+
+/* Compare function for sorting */
+int compare_int(const void *a, const void *b){
+    return (*(int*)a - *(int*)b);
+}
+
+void obtain_sudden_task_data(
+    int horizon,
+    int *rand_time,
+    int arrival[],
+    int periods[],
+    int executionTimes[],
+    int hard_or_weakly_hard[]
+) {
+    int minPeriod = 80;
+    int maxPeriod = 150;
+
+    int minEx = 2;
+    int maxEx = 4;
+
+    *rand_time = randi_range(1, (horizon + 499) / 500);
+
+    int total_possible = horizon - maxEx;
+    int temp[30000]={0};
+
+    if(total_possible > horizon) {
+        total_possible = horizon;
+    }
+
+    for(int i = 0; i < total_possible; i++) {
+        temp[i] = i + 1;
+    }
+
+    for(int i = total_possible - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+
+        int swap = temp[i];
+        temp[i] = temp[j];
+        temp[j] = swap;
+    }
+
+    for(int i = 0; i < *rand_time; i++) {
+        arrival[i] = temp[i];
+    }
+
+    qsort(arrival, *rand_time, sizeof(int), compare_int);
+
+    for(int i = 0; i < *rand_time; i++) {
+        periods[i] = randi_range(minPeriod, maxPeriod);
+        executionTimes[i] = randi_range(minEx, maxEx);
+
+        float p = 0.5f * ((float)rand() / RAND_MAX);
+        float random_value = (float)rand() / RAND_MAX;
+
+        hard_or_weakly_hard[i] = (random_value <= p) ? 1 : 0;
+    }
+}
+
+void obtain_weakly_hard_m_k(
+    int hard_or_weakly_hard,
+    int m_k_firm[2]
+){
+    int m, k;
+    if(hard_or_weakly_hard == 0){
+        /* Generate random m between 1 and 5 */
+        m = randi_range(1,5);
+
+        /* Constraint: m < k < 3*m */
+        int min_m = m + 1;
+        int max_m = 3 * m;
+
+        /* Generate k */
+        k = randi_range(min_m,max_m);
+    }
+    else{
+        m = 1;
+        k = 1;
+
+    }
+
+    m_k_firm[0] = m;
+    m_k_firm[1] = k;
+
+}
+
+
+int weakly_hard_requirement_check(int m_k_firm[2], int zer, int ind){
+
+    int prio_flag=0;
+   // For the first 'k' length portion, derermining priority of next job (thus writing 'ind+1' and 'zer+1')
+   if (ind < m_k_firm[1]){
+        // after allowing a miss next: #zeros in length k <= m
+        if (zer+1 <= m_k_firm[1]-m_k_firm[0]){
+            prio_flag=0;  // miss possible: low priority
+        }else{
+            prio_flag=1;  // miss not possible: high priority
+        }
+
+    // For the length >= k+1
+    }else{
+        // after allowing a miss next: fraction of total '1's in total length >= m/k
+        if (((float)((ind+1)-(zer+1))/(float)(ind+1)) >= (m_k_firm[0]/m_k_firm[1])){
+            prio_flag=0;  // miss possible: low priority
+        }
+        else{
+            prio_flag=1;  // miss not possible: high priority
+        }
+    }
+
+    return prio_flag;
 }
 

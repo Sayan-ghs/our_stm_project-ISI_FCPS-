@@ -262,8 +262,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include"STM_function.h"
-// #include"input.h"
-#include "input_13.h"
+#include"input.h"
+// #include "input_13.h"
 // #include "input_15.h"
 // #include "input_20.h"
 
@@ -326,7 +326,7 @@
 //#define SIM_TICKS 600
 
 #define n 13
-#define SIM_TICKS 30000
+#define SIM_TICKS 600
 
 // #define n 15
 // #define SIM_TICKS 600
@@ -436,7 +436,7 @@ int main(void) {
                 else{
                         hit_miss_matrix[i][j] = -1;
                 }
-                
+                // hit_miss_matrix[i][j] = 0;  
         }
     }
     for(int i = 0; i < n; i++) {
@@ -597,19 +597,19 @@ int main(void) {
                             // When total util > 1
                             if(schedule_edf==0){
                             	// SRSP Priority
-//                                if(t == 0){
-//                                        srsp_prio[i] = 1;
-//                                }
-//                                else{
-//                                        int pos = task_set[i].abs_deadline/task_set[i].period;
-//                                        srsp_prio[i] = srspPriorityGen(pos, inp_detail[i], x_nom_0[i], u_nom_0[i], x_hm_0[i], u_hm_0[i], x_nom_1[i], &u_nom_1[i], x_hm_1[i], &u_hm_1[i], lst[i], tot[i], hit_or_miss[i]);
-//                                        for (int k=0;k<inp_detail[i].dim;k++){
-//                                        	x_nom_0[i][k]=  x_nom_1[i][k];
-//                                        	x_hm_0[i][k] =  x_hm_1[i][k];
-//										}
-//                                        u_nom_0[i]=  u_nom_1[i];
-//                                        u_hm_0[i] =  u_hm_1[i];
-//                                }
+                            //    if(t == 0){
+                            //            srsp_prio[i] = 1;
+                            //    }
+                            //    else{
+                            //            int pos = task_set[i].abs_deadline/task_set[i].period -1;
+                            //            srsp_prio[i] = srspPriorityGen(pos, inp_detail[i], x_nom_0[i], u_nom_0[i], x_hm_0[i], u_hm_0[i], x_nom_1[i], &u_nom_1[i], x_hm_1[i], &u_hm_1[i], lst[i], tot[i], hit_or_miss[i]);
+                            //            for (int k=0;k<inp_detail[i].dim;k++){
+                            //            	x_nom_0[i][k]=  x_nom_1[i][k];
+                            //            	x_hm_0[i][k] =  x_hm_1[i][k];
+							// 			}
+                            //            u_nom_0[i]=  u_nom_1[i];
+                            //            u_hm_0[i] =  u_hm_1[i];
+                            //    }
 
 
                             	if (t==0){
@@ -663,7 +663,7 @@ int main(void) {
                                 if(srsp_prio[i] == 0){
                                         binary_search_add_element(only_EDF_list, size_EDF_list, task_set[i]);
                                         size_EDF_list++;
-                                }else{
+                                }else if(srsp_prio[i] == 1){
                                         binary_search_add_element(srsp_and_EDF_list, size_SRSP_EDF_list, task_set[i]);
                                         size_SRSP_EDF_list++;
                                 }
@@ -787,20 +787,20 @@ int main(void) {
                 }
             }
 //
-        //    if (t>=400){
-	// 			printf("\n At the End \n\n");
-	// 			printf("srsp_EDF_List\t");
+        //    if (t<=50){
+		// 		printf("\n At the End \n\n");
+		// 		printf("srsp_EDF_List\t");
 
-	// 			for(int k = 0; k<size_SRSP_EDF_list; k++){
-	// 				printf("%d, %d,  %d, %d\n",srsp_and_EDF_list[k].id,srsp_and_EDF_list[k].period, srsp_and_EDF_list[k].abs_deadline,srsp_and_EDF_list[k].remaining );
-	// 			}
+		// 		for(int k = 0; k<size_SRSP_EDF_list; k++){
+		// 			printf("%d, %d,  %d, %d\n",srsp_and_EDF_list[k].id,srsp_and_EDF_list[k].period, srsp_and_EDF_list[k].abs_deadline,srsp_and_EDF_list[k].remaining );
+		// 		}
 
-	// 			printf("\n only_EDF_list: \t");
+		// 		printf("\n only_EDF_list: \t");
         //                         printf("\ntask1 prio : %d, lst : %d, tot : %d, hit_or_miss : %d\n", srsp_prio[0], lst[0], tot[0], hit_or_miss[0]);
 
-	// 			for(int k = 0; k<size_EDF_list; k++){
-	// 				printf("%d ,%d , %d,  %d\n",only_EDF_list[k].id,only_EDF_list[k].period,only_EDF_list[k].abs_deadline, only_EDF_list[k].remaining);
-	// 			}
+		// 		for(int k = 0; k<size_EDF_list; k++){
+		// 			printf("%d ,%d , %d,  %d\n",only_EDF_list[k].id,only_EDF_list[k].period,only_EDF_list[k].abs_deadline, only_EDF_list[k].remaining);
+		// 		}
         //    }
 
             /********************************************************************************/
