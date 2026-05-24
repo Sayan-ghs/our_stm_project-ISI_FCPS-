@@ -326,7 +326,7 @@
 //#define SIM_TICKS 600
 
 #define n 13
-#define SIM_TICKS 600
+#define SIM_TICKS 30000
 
 // #define n 15
 // #define SIM_TICKS 600
