@@ -1,0 +1,174 @@
+************************************************ 64 MHz *******************************************8
+
+
+3 Tasks
+
+Average : 8.725 
+Max overhead : 23
+
+
+ jobs_scheduled, total_jobs : (5250, 5250)
+ units consumed, total bandwidth : (15001, 30000)
+--- ALL DATA REPORTED ---
+
+
+--------------------------------------------------------------------
+
+5 tasks
+
+Average : 12.140 
+Max overhead : 39
+
+ jobs_scheduled, total_jobs : (7250, 7250)
+ units consumed, total bandwidth : (19751, 30000)
+
+
+--------------------------------------------------------------------
+
+7 tasks
+
+Average : 15.188 
+Max overhead : 58
+
+
+ jobs_scheduled, total_jobs : (9350, 9350)
+ units consumed, total bandwidth : (24401, 30000)
+
+
+--------------------------------------------------------------------
+
+10 tasks
+
+Average : 21.553 
+Max overhead : 93
+
+
+ jobs_scheduled, total_jobs : (10700, 10700)
+ units consumed, total bandwidth : (29201, 30000)
+--- ALL DATA REPORTED ---
+
+--------------------------------------------------------------------
+
+11 tasks
+
+Average : 41.767 
+Max overhead : 4424
+
+new : 
+Average : 41.767 
+Max overhead : 4424
+
+new:
+Average: 22.
+
+--------------------------------------------------------------------
+
+12 tasks:
+---- Opened the serial port COM3 ----
+Average : 48.795 
+Max overhead : 4967
+
+new :
+Average : 48.571 
+Max overhead : 4967
+
+--------------------------------------------------------------------
+
+13 tasks
+
+---- Opened the serial port COM3 ----
+Average : 30.072 
+Max overhead : 16809
+
+New:
+Average : 36.361 
+Max overhead : 6936
+
+jobs_scheduled, total_jobs : (13632, 16700)
+units consumed, total bandwidth : (29984, 30000)
+
+-----------------------------------------------------------------
+
+
+15 tasks
+
+Average : 54.960 
+Max overhead : 19120
+
+
+ jobs_scheduled, total_jobs : (13804, 17300)
+ units consumed, total bandwidth : (29985, 30000)
+--- ALL DATA REPORTED ---
+
+new : 
+Average : 45.973 
+Max overhead : 7710
+
+--------------------------------------------------------------------
+
+20 tasks
+
+---- Opened the serial port COM3 ----
+Average : 94.555 
+Max overhead : 10163
+
+Average : 16.291 
+
+jobs_scheduled, total_jobs : (15432, 19500)
+units consumed, total bandwidth : (30000, 30000)
+
+
+
+*************************************************************************************************************************************************
+
+3 Tasks:
+Average : 8.758 
+Max overhead : 23
+------------------------------------------------------------------
+
+5 Tasks:
+Average : 12.108 
+Max overhead : 39
+------------------------------------------------------------------
+
+7 Tasks:
+Average : 15.267 
+Max overhead : 58
+
+------------------------------------------------------------------
+
+10 Tasks:
+
+Average : 19.969 
+Max overhead : 84
+
+------------------------------------------------------------------
+
+11 tasks
+
+Average : 15.536 
+Max overhead : 70
+
+------------------------------------------------------------------
+
+12 tasks 
+Average : 20.321 
+Max overhead : 82
+------------------------------------------------------------------
+
+13 tasks
+
+Average : 38.338 
+Max overhead : 112
+
+-----------------------------------------------------------------
+
+15 Tasks
+Average : 47.991 
+Max overhead : 150
+
+-----------------------------------------------------------------
+
+20 tasks 
+Average : 95.756 
+Max overhead : 178

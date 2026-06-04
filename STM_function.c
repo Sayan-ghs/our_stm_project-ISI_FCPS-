@@ -456,7 +456,7 @@ void obtain_sudden_task_data(
     int minEx = 2;
     int maxEx = 4;
 
-    *rand_time = randi_range(1, (horizon + 499) / 500);
+    *rand_time = randi_range(1, horizon / 500);
 
     int total_possible = horizon - maxEx;
     int temp[30000]={0};
